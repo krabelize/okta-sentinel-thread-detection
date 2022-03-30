@@ -1,5 +1,5 @@
-# Okta Thread Detection with Microsoft Sentinel
-20 Okta SOC Thread Detection alerts for Microsoft Sentinel
+# Okta Threat Detection with Microsoft Sentinel
+20 Okta SOC Threat Detection alerts for Microsoft Sentinel
 
 [Read this blog post for more information.](https://cryptsus.com/blog/okta-iam-threat-hunting-siem-use-cases.html)
 
