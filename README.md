@@ -1,7 +1,7 @@
 # Okta Sentinel Thread Detection
 20 Okta SOC Thread Detection alerts for Microsoft Sentinel
 
-[Read this blog post for more information.](https://github.com/krabelize/okta-sentinel-thread-detection/edit/main/README.md)
+[Read this blog post for more information.](https://cryptsus.com/blog/okta-iam-threat-hunting-siem-use-cases.html)
 
 **1. Okta administrator successfully logs in from a new country OR a new geo-location OR a new device**
 ```
