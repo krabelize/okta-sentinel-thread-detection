@@ -25,7 +25,8 @@ Okta_CL
 ```
 
 **3. Okta user successfully logs in from a new country AND a new geo-location AND a new device**
-```Okta_CL
+```
+Okta_CL
   | where eventType_s == "user.session.start"
   | where outcome_result_s == "SUCCESS"
   | where parse_json(tostring(parse_json(debugContext_debugData_logOnlySecurityData_s).behaviors)).["New Country"] == "POSITIVE"
@@ -36,7 +37,8 @@ Okta_CL
 ```
 
 **4. Okta user successfully logs in from an IP flagged by Emerging Threats or Abuse.ch Threat Intelligence sources**
-```let malicious_ips = (externaldata(possibly_malicous_ip:string)
+```
+let malicious_ips = (externaldata(possibly_malicous_ip:string)
   [
   @"https://rules.emergingthreats.net/fwrules/emerging-Block-IPs.txt",
   @"https://feodotracker.abuse.ch/downloads/ipblocklist_recommended.txt",
@@ -56,7 +58,8 @@ Okta_CL
 ```
 
 **5. Okta user successfully logs in from a Tor exit node**
-```let malicious_ips = (externaldata(possibly_malicous_ip:string)
+```
+let malicious_ips = (externaldata(possibly_malicous_ip:string)
   [
   @"https://github.com/SecOps-Institute/Tor-IP-Addresses/blob/master/tor-nodes.lst",
   @"https://github.com/SecOps-Institute/Tor-IP-Addresses/blob/master/tor-exit-nodes.lst"
@@ -74,7 +77,8 @@ Okta_CL
 ```
 
 **6. Okta user changed their MFA method or password from a different country**
-```Okta_CL
+```
+Okta_CL
   | where eventType_s == "user.mfa.factor.activate" and outcome_reason_s == "User set up OKTA_VERIFY_PUSH factor" and outcome_result_s == "SUCCESS"
   | where isnotempty(client_geographicalContext_country_s)
   | join kind = leftanti(
@@ -87,7 +91,8 @@ Okta_CL
 ```
 
 **7. Okta Global administrator successfully logs in**
-```Okta_CL
+```
+Okta_CL
   | where actor_alternateId_s == "globaladmin@cryptsus.com" or actor_id_s == "deadBEEF1337admin"
   | where eventType_s == "user.session.start"
   | where outcome_result_s == "SUCCESS"
@@ -95,7 +100,8 @@ Okta_CL
 ```
 
 **8. Okta password spray attacks on your Okta tenant**
-```Okta_CL
+```
+Okta_CL
   | where debugContext_debugData_threatDetections_s contains "Password Spray" or debugContext_debugData_threatDetections_s contains "Brute Force" or debugContext_debugData_threatDetections_s contains \xe2\x80\x9cOkta Brute Force"
     and severity_s == "WARN" or severity_s == "ERROR"
     and debugContext_debugData_threatSuspected_s == "true"
@@ -103,7 +109,8 @@ Okta_CL
 ```
 
 **9. Okta API token created**
-```Okta_CL
+```
+Okta_CL
   | where eventType_s == "system.api_token.create"
   | where outcome_result_s == "SUCCESS"
   | project TimeGenerated, actor_displayName_s, securityContext_isp_s
@@ -111,7 +118,8 @@ Okta_CL
 ```
 
 **10. Okta user attempts to access unauthorised application(s)**
-```let threshold = 0;
+```
+let threshold = 0;
   Okta_CL
   | where isnotempty(actor_alternateId_s)
   | where eventType_s == "app.generic.unauth_app_access_attempt"
@@ -123,7 +131,8 @@ Okta_CL
 ```
 
 **11. More than two MFA push notifications got rejected by the Okta user**
-```let threshold = 1;
+```
+let threshold = 1;
   Okta_CL
   | where isnotempty(actor_alternateId_s)
   | where eventType_s == "user.mfa.okta_verify.deny_push"
@@ -132,7 +141,8 @@ Okta_CL
 ```
 
 **12. Okta policy change occurred**
-```Okta_CL
+```
+Okta_CL
   | where eventType_s == "policy.rule.update" or eventType_s == "policy.lifecycle.update" or eventType_s == "policy.rule.create" or eventType_s == "policy.lifecycle.create"  or eventType_s == "policy.rule.delete" or eventType_s == "policy.lifecycle.delete" or eventType_s == "policy.rule.deactivate" or eventType_s == "policy.lifecycle.deactivate" or eventType_s == "policy.rule.modify" or eventType_s == "policy.lifecycle.modify" or eventType_s == "policy.rule.invalidate" or eventType_s == "policy.lifecycle.invalidate" or eventType_s == "policy.rule.activate" or eventType_s == "policy.lifecycle.activate" or eventType_s == "policy.rule.add" or eventType_s == "policy.lifecycle.add" or eventType_s == "policy.lifecycle.override" or eventType_s ==
 "policy.rule.add" or eventType_s == "policy.lifecycle.override" or eventType_s == "network_zone.rule.disabled" or eventType_s == "zone.activate" or eventType_s == "zone.create" or eventType_s == "zone.deactivate" or eventType_s == "zone.delete" or eventType_s == "zone.update" or eventType_s == "application.policy.sign_on.rule.create" or eventType_s == "application.policy.sign_on.rule.delete" or eventType_s == "application.policy.sign_on.rule.delete" or eventType_s == "security.authenticator.lifecycle.deactivate" or eventType_s == "user.mfa.factor.reset_all" or eventType_s == "system.mfa.factor.deactivate" or eventType_s == "security.authenticator.lifecycle.deactivate"
   | where outcome_result_s == "SUCCESS"
@@ -141,7 +151,8 @@ Okta_CL
 ```
 
 **13. More than 5 applications connections got deleted within Okta**
-```let threshold = 4;
+```
+let threshold = 4;
   Okta_CL
   | where isnotempty(actor_alternateId_s)
   | where eventType_s == "application.lifecycle.delete"
@@ -151,7 +162,8 @@ Okta_CL
 ```
 
 **14. Okta users is not authenticating with the Okta MFA mobile app**
-```Okta_CL
+```
+Okta_CL
   | where eventType_s == "system.sms.send_factor_verify_message" or eventType_s == "system.email.send_factor_verify_message" or eventType_s == "system.voice.send_mfa_challenge_call" and eventType_s != "system.push.send_factor_verify_push"
   | where outcome_result_s == "SUCCESS"
   | project TimeGenerated, displayMessage_s, actor_displayName_s, debugContext_debugData_phoneNumber_s, client_userAgent_os_s, client_userAgent_browser_s, client_ipAddress_s, client_geographicalContext_country_s, client_geographicalContext_city_s
@@ -159,7 +171,8 @@ Okta_CL
 ```
 
 **15. More than 10 failed Okta login attempts**
-```let threshold = 9;
+```
+let threshold = 9;
   Okta_CL
   | where isnotempty(actor_alternateId_s)
   | where eventType_s == "user.session.start"
@@ -169,20 +182,23 @@ Okta_CL
 ```
 
 **16. Okta admin role assigned**
-```Okta_CL
+```
+Okta_CL
   | where eventType_s == "user.account.privilege.grant" or eventType_s == "group.privilege.grant"
   | where outcome_result_s  == "SUCCESS"
   | project TimeGenerated, debugContext_debugData_privilegeGranted_s, actor_alternateId_s, client_userAgent_os_s, client_userAgent_browser_s, client_geographicalContext_country_s, client_geographicalContext_city_s, client_ipAddress_s, parse_json(target_s)[0].alternateId
 ```
 
 **17: Okta suspicious activity reported**
-```Okta_CL
+```
+Okta_CL
   | where eventType_s == "user.account.report_suspicious_activity_by_enduser" or eventType_s == "user.session.impersonation.initiate" or eventType_s == "user.session.impersonation.grant" or eventType_s == "user.mfa.attempt_bypass" or eventType_s == "user.mfa.factor.suspend" or eventType_s == "user.account.update_primary_email"
   | sort by TimeGenerated
 ```
 
 **18: Okta impossible impossible travel anomaly within 1 hour**
-```let threshold = 1;
+```
+let threshold = 1;
   Okta_CL
   | where TimeGenerated > ago(1h)
   | where eventType_s == "user.session.start"
@@ -194,7 +210,8 @@ Okta_CL
 ```
 
 **19: Okta user logs in with a possibly bad user-agent**
-```let malicious_user_agents = (externaldata(possibly_malicous_user_agents:string)
+```
+let malicious_user_agents = (externaldata(possibly_malicous_user_agents:string)
   [
   @"https://raw.githubusercontent.com/repo/to/bad-user_agents.txt"
   ]
@@ -210,14 +227,16 @@ Okta_CL
 ```
 
 **20. Locked out Okta users**
-```Okta_CL
+```
+Okta_CL
   | where eventType_s == "user.account.lock"
   | project TimeGenerated, displayMessage_s, actor_displayName_s, actor_alternateId_s, client_userAgent_os_s, client_device_s, client_geographicalContext_country_s, outcome_reason_s
   | sort by TimeGenerated
 ```
 
 **And the Okta user got unlocked**
-```Okta_CL
+```
+Okta_CL
   | where eventType_s == "system.email.mfa_reset_notification.sent_message"
   | extend parse_json(target_s)[0].displayName
   | project TimeGenerated, target_s_0_displayName, actor_alternateId_s, client_userAgent_os_s,client_geographicalContext_country_s, client_geographicalContext_city_s
