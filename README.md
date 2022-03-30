@@ -4,7 +4,8 @@
 [Read this blog post for more information.](https://github.com/krabelize/okta-sentinel-thread-detection/edit/main/README.md)
 
 **1. Okta administrator successfully logs in from a new country OR a new geo-location OR a new device**
-```Okta_CL
+```
+Okta_CL
   | where isnotempty(actor_alternateId_s)
   | where eventType_s == "user.session.access_admin_app"
   | where outcome_result_s == "SUCCESS"
@@ -14,7 +15,8 @@
 ```
 
 **2: Okta Administrator logs in during non-business hours**
-```Okta_CL
+```
+Okta_CL
   | where eventType_s == "user.session.access_admin_app"
   | where outcome_result_s == "SUCCESS"
   | where hourofday(TimeGenerated) !between (5 .. 19)
